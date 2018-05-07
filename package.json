@@ -1,0 +1,10 @@
+{
+  "name": "j-archive-scraper",
+  "version": "0.1.0",
+  "description": "Web scraper for getting jeopardy data from j-archive",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^4.19.1"
+  }
+}
