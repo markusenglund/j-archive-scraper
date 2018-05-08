@@ -1,6 +1,7 @@
 const fs = require("fs");
 const cheerio = require("cheerio");
 const axios = require("axios");
+const parseDate = require("date-fns/parse");
 
 const latestGameId = 5972;
 /*
@@ -14,11 +15,19 @@ const fetchGameData = gameId => {
     .then(({ data }) => {
       const $ = cheerio.load(data);
 
+      const airDateString = $("#game_title")
+        .text()
+        .split(" - ")[1];
+      const airDate = parseDate(
+        airDateString,
+        "dddd, MMMM D, YYYY",
+        new Date()
+      );
+
       const categories = [];
       $(".category_name").each(function() {
         categories.push($(this).text());
       });
-      console.log(categories);
 
       const clues = [];
       $(".clue_text").each(function(i) {
@@ -39,9 +48,9 @@ const fetchGameData = gameId => {
           round = "fj";
         }
 
-        clues.push({ clue, category, round, value });
+        clues.push({ clue, category, round, value, airDate });
       });
-      // console.log(clues);
+      console.log(clues);
     });
 };
 
