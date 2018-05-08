@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const axios = require("axios");
 const parseDate = require("date-fns/parse");
 
-const latestGameId = 5971;
+const latestGameId = 5968;
 /*
 clue = { clue, answer, category, value, isDailyDouble, round, gameId, airDate }
 
@@ -66,18 +66,20 @@ const fetchGameData = gameId => {
         const isDailyDouble = !!cheerio(".clue_value_daily_double", elem)
           .length;
 
-        clues.push({
-          clue,
-          response,
-          category,
-          isDailyDouble,
-          round,
-          value,
-          airDate
-        });
+        if (clue !== "") {
+          clues.push({
+            clue,
+            response,
+            category,
+            isDailyDouble,
+            round,
+            value,
+            airDate
+          });
+        }
       });
 
-      console.log(clues);
+      console.log(clues.length);
     });
 };
 
