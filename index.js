@@ -62,7 +62,19 @@ const fetchGameData = gameId => {
           response = cheerio("em", mouseOverContent).text();
         }
 
-        clues.push({ clue, response, category, round, value, airDate });
+        // Check if clue was daily double
+        const isDailyDouble = !!cheerio(".clue_value_daily_double", elem)
+          .length;
+
+        clues.push({
+          clue,
+          response,
+          category,
+          isDailyDouble,
+          round,
+          value,
+          airDate
+        });
       });
 
       console.log(clues);
