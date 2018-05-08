@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const axios = require("axios");
 const parseDate = require("date-fns/parse");
 
-const latestGameId = 5968;
+const latestGameId = 123;
 /*
 clue = { clue, answer, category, value, isDailyDouble, round, gameId, airDate }
 
@@ -49,7 +49,7 @@ const fetchGameData = gameId => {
           round = "fj";
         }
 
-        const clue = cheerio(".clue_text", elem).text();
+        const clue = cheerio(".clue_text", elem).html();
 
         // Get response by accessing the onmouseover value and parsing it as a cheerio object
         let response;
@@ -74,12 +74,13 @@ const fetchGameData = gameId => {
             isDailyDouble,
             round,
             value,
-            airDate
+            airDate,
+            gameId
           });
         }
       });
 
-      console.log(clues.length);
+      console.log(clues);
     });
 };
 
