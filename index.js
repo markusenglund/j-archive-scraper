@@ -2,18 +2,14 @@ const fs = require("fs");
 const cheerio = require("cheerio");
 const axios = require("axios");
 const parseDate = require("date-fns/parse");
-
-const latestGameId = 123;
-/*
-clue = { clue, answer, category, value, isDailyDouble, round, gameId, airDate }
-
-*/
+const pMap = require("p-map");
 
 const fetchGameData = gameId => {
-  axios
+  return axios
     .get(`http://www.j-archive.com/showgame.php?game_id=${gameId}`)
     .then(({ data }) => {
       const $ = cheerio.load(data);
+      const clues = [];
 
       const airDateString = $("#game_title")
         .text()
@@ -28,8 +24,6 @@ const fetchGameData = gameId => {
       $(".category_name").each(function() {
         categories.push($(this).text());
       });
-
-      const clues = [];
 
       $(".clue").each(function(i, elem) {
         // Calculate category, round and value based off of index of clue
@@ -79,9 +73,20 @@ const fetchGameData = gameId => {
           });
         }
       });
-
-      console.log(clues);
+      if (gameId % 5 === 0) {
+        console.log(gameId);
+      }
+      return clues;
+    })
+    .catch(() => {
+      console.log("ERROR", gameId);
     });
 };
 
-fetchGameData(latestGameId);
+// Use p-map to throttle http requests to j-archive to avoid timeouts
+pMap(new Array(5972), (_, i) => fetchGameData(i + 1), { concurrency: 15 })
+  .then(games => games.reduce((acc, game) => acc.concat(game), []))
+  .then(clues => {
+    console.log("DONE!");
+    fs.writeFileSync("clues.json", JSON.stringify(clues));
+  });
