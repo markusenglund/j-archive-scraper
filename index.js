@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const axios = require("axios");
 const parseDate = require("date-fns/parse");
 
-const latestGameId = 5972;
+const latestGameId = 5971;
 /*
 clue = { clue, answer, category, value, isDailyDouble, round, gameId, airDate }
 
@@ -30,8 +30,9 @@ const fetchGameData = gameId => {
       });
 
       const clues = [];
-      $(".clue_text").each(function(i) {
-        const clue = $(this).text();
+
+      $(".clue").each(function(i, elem) {
+        // Calculate category, round and value based off of index of clue
         let category;
         let round;
         let value;
@@ -48,8 +49,22 @@ const fetchGameData = gameId => {
           round = "fj";
         }
 
-        clues.push({ clue, category, round, value, airDate });
+        const clue = cheerio(".clue_text", elem).text();
+
+        // Get response by accessing the onmouseover value and parsing it as a cheerio object
+        let response;
+        if (i < 60) {
+          const mouseOverContent = cheerio("div", elem).attr("onmouseover");
+          // console.log(mouseOverContent);
+          response = cheerio(".correct_response", mouseOverContent).text();
+        } else if (i === 60) {
+          const mouseOverContent = $(".final_round div").attr("onmouseover");
+          response = cheerio("em", mouseOverContent).text();
+        }
+
+        clues.push({ clue, response, category, round, value, airDate });
       });
+
       console.log(clues);
     });
 };
